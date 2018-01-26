@@ -30,3 +30,4 @@ reportlab==2.7
 requests==2.3.0
 South==0.8.2
 tweepy==2.2
+sqlparse==0.1.1
