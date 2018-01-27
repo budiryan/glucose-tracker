@@ -20,12 +20,175 @@ from core import utils as core_utils
 
 from .models import Glucose
 
+from .models import Color
+
 
 logger = logging.getLogger(__name__)
 
 DATE_FORMAT = '%m/%d/%Y'
 FILENAME_DATE_FORMAT = '%b%d%Y'
 TIME_FORMAT = '%I:%M %p'
+
+
+class UserStatsColor(object):
+
+    def __init__(self, user):
+        self.user = user
+        self.data = Color.objects.by_user(self.user)
+        self.glucose_unit_name = user.settings.glucose_unit.name
+
+    def glucose_by_unit_setting(self, value):
+        return core_utils.glucose_by_unit_setting(self.user, value)
+
+    @property
+    def user_settings(self):
+        user_settings = self.user.settings
+        low = user_settings.glucose_low
+        high = user_settings.glucose_high
+        target_min = user_settings.glucose_target_min
+        target_max = user_settings.glucose_target_max
+
+        return {
+            'low': low,
+            'high': high,
+            'target_min': target_min,
+            'target_max': target_max
+        }
+
+    @property
+    def user_stats(self):
+        stats = {
+            'latest_entry': self.latest_entry,
+            'num_records': self.data.count(),
+            'hba1c': self.hba1c,
+            'breakdown': self.get_breakdown(),
+        }
+
+        return stats
+
+    @property
+    def latest_entry(self):
+        latest_entry = self.data.order_by('-record_date', '-record_time')[0] \
+            if self.data else None
+
+        latest_entry_value = 'None'
+        latest_entry_time = latest_entry_notes = ''
+        css_class = self.get_css_class(None)
+        if latest_entry:
+            latest_entry_value = '%s' % \
+                                 (self.glucose_by_unit_setting(latest_entry.value))
+            latest_entry_time = latest_entry.record_time.strftime(TIME_FORMAT)
+            latest_entry_notes = latest_entry.notes
+            css_class = self.get_css_class(latest_entry.value)
+
+        return {
+            'value': latest_entry_value,
+            'record_time': latest_entry_time,
+            'notes': latest_entry_notes,
+            'css_class': css_class,
+        }
+
+
+    @property
+    def hba1c(self):
+        """
+        The HbA1c is calculated using the average blood glucose from the last
+        90 days.
+
+            Less than 7 = Excellent
+            Between 7 and 8 = Average
+            Greater than 8 = Bad
+        """
+        now = datetime.now(tz=self.user.settings.time_zone).date()
+        subset = self.by_date(now - timedelta(days=90), now)
+        average = core_utils.round_value(
+            subset.aggregate(Avg('value'))['value__avg'])
+        hba1c = core_utils.round_value(core_utils.calc_hba1c(average))
+
+        css_class = 'text-default'
+
+        if hba1c:
+            if hba1c < 7:
+                css_class = 'text-success'
+            elif hba1c > 8:
+                css_class = 'text-danger'
+            else:
+                css_class = 'text-primary'
+
+        value_html = '%s%%<br><small>(%s %s)</small>' % \
+                     (hba1c, self.glucose_by_unit_setting(average),
+                      self.glucose_unit_name) \
+            if hba1c else 'None<br><small>(None)</small>'
+
+        return {
+            'value': value_html,
+            'css_class': css_class
+        }
+
+    def get_breakdown(self, days=14):
+        now = datetime.now(tz=self.user.settings.time_zone).date()
+        subset = self.by_date(now - timedelta(days=days), now)
+
+        total = subset.count()
+        lowest = subset.aggregate(Min('value'))['value__min']
+        highest = subset.aggregate(Max('value'))['value__max']
+        average = core_utils.round_value(
+            subset.aggregate(Avg('value'))['value__avg'])
+
+        highs = subset.filter(value__gt=self.user_settings['high']).count()
+        lows = subset.filter(value__lt=self.user_settings['low']).count()
+        within_target = subset.filter(
+            value__gte=self.user_settings['target_min'],
+            value__lte=self.user_settings['target_max']
+        ).count()
+        other = total - (highs + lows + within_target)
+
+        return {
+            'total': total,
+            'lowest': {
+                'value': '%s' % (self.glucose_by_unit_setting(lowest)) \
+                    if lowest else 'None',
+                'css_class': self.get_css_class(lowest),
+            },
+            'highest': {
+                'value': '%s' % (self.glucose_by_unit_setting(highest)) \
+                    if highest else 'None',
+                'css_class': self.get_css_class(highest),
+            },
+            'average': {
+                'value': '%s' % (self.glucose_by_unit_setting(average)) \
+                    if average else 'None',
+                'css_class': self.get_css_class(average)
+            },
+            'highs': '%s (%s%%)' % (highs, core_utils.percent(highs, total)),
+            'lows': '%s (%s%%)' % (lows, core_utils.percent(lows, total)),
+            'within_target': '%s (%s%%)' % (
+                within_target, core_utils.percent(within_target, total)),
+            'other': '%s (%s%%)' % (other, core_utils.percent(other, total)),
+
+        }
+
+    def by_date(self, start, end):
+        return self.data.filter(record_date__gte=start, record_date__lte=end)
+
+    def get_css_class(self, value):
+        css_class = 'text-default'
+
+        low = self.user_settings['low']
+        high = self.user_settings['high']
+        target_min = self.user_settings['target_min']
+        target_max = self.user_settings['target_max']
+
+        # Only change the css_class if a value exists.
+        if value:
+            if value < low or value > high:
+                css_class = 'text-danger'
+            elif value >= target_min and value <= target_max:
+                css_class = 'text-success'
+            else:
+                css_class = 'text-primary'
+
+        return css_class
 
 
 class UserStats(object):
@@ -133,7 +296,7 @@ class UserStats(object):
         highest = subset.aggregate(Max('value'))['value__max']
         average = core_utils.round_value(
             subset.aggregate(Avg('value'))['value__avg'])
-        
+
         highs = subset.filter(value__gt=self.user_settings['high']).count()
         lows = subset.filter(value__lt=self.user_settings['low']).count()
         within_target = subset.filter(
@@ -155,7 +318,7 @@ class UserStats(object):
                                     self.glucose_unit_name) \
                     if highest else 'None',
                 'css_class': self.get_css_class(highest),
-            },  
+            },
             'average': {
                 'value': '%s %s' % (self.glucose_by_unit_setting(average),
                                     self.glucose_unit_name) \
@@ -191,6 +354,74 @@ class UserStats(object):
                 css_class = 'text-primary'
 
         return css_class
+
+
+class ChartDataColor(object):
+
+    @classmethod
+    def get_count_by_category(cls, user, days):
+        now = datetime.now(tz=user.settings.time_zone).date()
+
+        category_count = Color.objects.by_category(
+            (now - timedelta(days=days)), now, user)
+
+        data = [[c['category__name'], c['count']] for c in category_count]
+
+        return data
+
+    @classmethod
+    def get_level_breakdown(cls, user, days):
+        now = datetime.now(tz=user.settings.time_zone).date()
+
+        glucose_level = Color.objects.level_breakdown(
+            (now - timedelta(days=days)), now, user)
+
+        chart_colors = {
+            'Low': 'orange',
+            'High': 'red',
+            'Within Target': 'green',
+            'Other': 'blue'
+        }
+
+        data = []
+        keyorder = ['Low', 'High', 'Within Target', 'Other']
+        for k, v in sorted(glucose_level.items(),
+                           key=lambda i: keyorder.index(i[0])):
+            data.append({'name': k, 'y': v, 'color': chart_colors[k]})
+
+        return data
+
+    @classmethod
+    def get_avg_by_category(cls, user, days):
+        now = datetime.now(tz=user.settings.time_zone).date()
+
+        glucose_averages = Color.objects.avg_by_category(
+            (now - timedelta(days=days)), now, user)
+
+        data = {'categories': [], 'values': []}
+        for avg in glucose_averages:
+            rounded_value = core_utils.round_value(avg['avg_value'])
+            data['values'].append(
+                core_utils.glucose_by_unit_setting(user, rounded_value))
+            data['categories'].append(avg['category__name'])
+
+        return data
+
+    @classmethod
+    def get_avg_by_day(cls, user, days):
+        now = datetime.now(tz=user.settings.time_zone).date()
+
+        glucose_averages = Color.objects.avg_by_day(
+            (now - timedelta(days=days)), now, user)
+
+        data = {'dates': [], 'values': []}
+        for avg in glucose_averages:
+            rounded_value = core_utils.round_value(avg['avg_value'])
+            data['values'].append(
+                core_utils.glucose_by_unit_setting(user, rounded_value))
+            data['dates'].append(avg['record_date'].strftime('%m/%d'))
+
+        return data
 
 
 class ChartData(object):
@@ -231,7 +462,7 @@ class ChartData(object):
     @classmethod
     def get_avg_by_category(cls, user, days):
         now = datetime.now(tz=user.settings.time_zone).date()
-        
+
         glucose_averages = Glucose.objects.avg_by_category(
             (now - timedelta(days=days)), now, user)
 
@@ -323,7 +554,7 @@ class GlucoseCsvReport(GlucoseBaseReport):
 
     def email(self, recipient, subject='', message=''):
         message = '%s\n\n\n%s' % (message, self.email_footer)
-        
+
         email = EmailMessage(
             from_email=settings.CONTACTS['info_email'],
             subject=subject,

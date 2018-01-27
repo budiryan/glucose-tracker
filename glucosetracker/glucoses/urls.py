@@ -5,13 +5,20 @@ from .views import (
     filter_view,
     quick_add,
     stats_json,
+    stats_json_color,
+    dashboard_2,
     chart_data_json,
+    chart_data_color_json,
     GlucoseChartsView,
     GlucoseCreateView,
     GlucoseUpdateView,
     GlucoseDeleteView,
     GlucoseEmailReportView,
     GlucoseListJson,
+    ColorListJson,
+    ColorCreateView,
+    ColorDeleteView,
+    ColorUpdateView
 )
 
 
@@ -37,9 +44,19 @@ urlpatterns = patterns('',
         name='glucose_create',
     ),
     url(
+        regex=r'^add-color/',
+        view=ColorCreateView.as_view(),
+        name='color_create',
+    ),
+    url(
         regex=r'^list_json/$',
         view=GlucoseListJson.as_view(),
         name='glucose_list_json',
+    ),
+    url(
+        regex=r'^color_list_json/$',
+        view=ColorListJson.as_view(),
+        name='color_list_json',
     ),
     url(
         regex=r'^chart_data_json/$',
@@ -47,9 +64,19 @@ urlpatterns = patterns('',
         name='chart_data_json',
     ),
     url(
+        regex=r'^chart_data_color_json/$',
+        view=chart_data_color_json,
+        name='chart_data_color_json',
+    ),
+    url(
         regex=r'^stats_json/$',
         view=stats_json,
         name='stats_json',
+    ),
+    url(
+        regex=r'^stats_json_color/$',
+        view=stats_json_color,
+        name='stats_json_color',
     ),
     url(
         regex=r'^charts/$',
@@ -65,6 +92,16 @@ urlpatterns = patterns('',
         regex=r'^(?P<pk>\d+)/edit/',
         view=GlucoseUpdateView.as_view(),
         name='glucose_update',
+    ),
+    url(
+        regex=r'^(?P<pk>\d+)/edit-color/',
+        view=ColorUpdateView.as_view(),
+        name='color_update',
+    ),
+    url(
+        regex=r'^(?P<pk>\d+)/delete-color/',
+        view=ColorDeleteView.as_view(),
+        name='color_delete',
     ),
     url(
         regex=r'^(?P<pk>\d+)/delete/',

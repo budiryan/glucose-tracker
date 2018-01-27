@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block heading %}<h3>
+    <span class="fa fa-times"></span> Delete Urine Color</h3>{% endblock %}
+
+{% block content %}
+<div class="form-group">
+    <form action="{% url 'color_delete' color.id %}" method="post">
+        {% csrf_token %}
+        <p>Deleting urine color entry <b>{{ color.value }} ({{ color.category }})</b>. Are you sure?</p>
+        <br>
+        <button type="submit" class="btn btn-primary" action="submit">Yes, I'm sure</button>
+        <button type="button" class="btn" onclick="location.href=&quot;{% url 'dashboard-2' %}&quot;;">Cancel</button>
+    </form>
+</div>
+{% endblock %}

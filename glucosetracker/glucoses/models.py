@@ -158,7 +158,7 @@ class ColorManager(models.Manager):
 
 class Color(TimeStampedModel):
     objects = ColorManager()
-
+    category = models.ForeignKey('Category')
     user = models.ForeignKey(User)
     value = models.PositiveIntegerField(validators=[MaxValueValidator(54054),
                                                     MinValueValidator(0)])

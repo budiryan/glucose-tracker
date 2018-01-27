@@ -1,9 +1,8 @@
-GlucoseTracker
+FYP Urinalysis
 ==============
 
-A simple web application for keeping track of blood glucose levels.  Written in Python using the Django framework.
+A simple tracker app for FYP Urinalysis.<br>
 
-<b>Main Site:</b> https://www.glucosetracker.net
 
 <b>Features:</b>
 
@@ -12,12 +11,11 @@ A simple web application for keeping track of blood glucose levels.  Written in 
 * <b>Reporting.</b>  Simple reports to see how you're doing.  Highlight how many times you have lows and highs. Show averages by day and category using nice-looking charts and graphs.
 * <b>Data filtering.</b>  Advanced filtering: filter by glucose range, date range, category, tag, and notes.
 * <b>Tagging.</b>  An optional tag field to help further organize and make sense of your data. For example, it might be useful to add tags to a record such as: exercise, sick, insulin, fasting, etc.
-* <b>A1C estimation.</b>  Estimate A1C based on data from the last 3 months.
 * <b>Import data from CSV.</b> Import existing data from other software/systems.
 * <b>Mobile friendly.</b>  Layout adapts to screen size.
 
 <b>Some point in the future:</b>
-
+* Auto receive daily urine data from STM32 Micro-controller
 * A simple Android app that works offline and auto-syncs with the remote database via REST calls.
 
 
@@ -26,10 +24,10 @@ Installation/Running the App
 
 1. Install the required libraries listed in the requirements file with pip: pip install -r requirements.txt
 2. If you just want to run a demo of the app, use the <b>settings/localdemo.py</b> file which uses an SQLite database and will be created automatically. Otherwise, for development, please use PostgreSQL and the settings/local.py file.  Set the database settings and environment variables accordingly.
-3. Run the syncdb command: e.g. python manage.py syncdb --noinput --settings=settings.localdemo
-4. Run the South migration: e.g. python manage.py migrate --settings=settings.localdemo
+3. Run the syncdb command: e.g. `python manage.py syncdb --noinput --settings=settings.localdemo`
+4. Run the South migration: e.g. `python manage.py migrate --settings=settings.localdemo`
 5. (Optional) Populate your database with dummy data: e.g. python manage.py load_random_glucose_data jsmith --settings=settings.localdemo (note that 'jsmith' can be changed to any username you like, the password will always be 'demo').
-6. Run the local web server: e.g. python manage.py runserver --settings=settings.localdemo
+6. Run the local web server: e.g. `python manage.py runserver --settings=settings.localdemo`
 
 3rd-Party Apps/Libraries/Plugins
 --------------------------------

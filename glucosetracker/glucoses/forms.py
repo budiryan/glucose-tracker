@@ -9,7 +9,7 @@ from crispy_forms.layout import Button, Submit, MultiField, Div, HTML, \
     Field, Fieldset, Reset
 from crispy_forms.bootstrap import FormActions
 
-from .models import Glucose, Category
+from .models import Glucose, Category, Color
 from .fields import RestrictedFileField
 
 
@@ -201,6 +201,61 @@ class GlucoseEmailReportForm(forms.Form):
         self.fields['optional_fields'].initial = ['notes']
         self.fields['subject'].initial = '[GlucoseTracker] Glucose Data Report'
 
+class ColorInputForm(forms.ModelForm):
+    # This is a hidden field that holds the submit type value. Used to
+    # determine whether the user clicked 'Save' or 'Save & Add Another' in
+    # the Glucose Create Form.
+    submit_button_type = forms.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(ColorInputForm, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_class = 'form-horizontal col-xs-12 col-md-6 col-lg-5'
+        self.helper.label_class = 'col-xs-3 col-md-2 col-lg-2'
+        self.helper.field_class = 'col-xs-9 col-md-10 col-lg-10'
+        self.helper.add_input(Submit('submit', 'Save'))
+        self.helper.add_input(Button(
+            'cancel', 'Cancel', onclick='location.href="%s";' % \
+                                        reverse('dashboard')))
+
+        # Remove the blank option from the select widget.
+        self.fields['category'].empty_label = None
+        self.fields['category'].required = False
+
+        # Specify which time formats are valid for this field. This setting is
+        # necessary when using the bootstrap-datetimepicker widget as it
+        # doesn't allow inputting of seconds.
+        valid_time_formats = ['%H:%M', '%I:%M%p', '%I:%M %p']
+        self.fields['record_time'].input_formats = valid_time_formats
+
+        self. helper.layout = Layout(
+            HTML(
+                '''
+                {% if messages %}
+                {% for message in messages %}
+                <p {% if message.tags %}
+                class="alert alert-{{ message.tags }}"
+                {% endif %}>{{ message }}</p>{% endfor %}{% endif %}
+                '''
+            ),
+            Field('value', placeholder='Value', required=True, autofocus=True,
+                  min=0, step='any'),
+            'category',
+            'record_date',
+            'record_time',
+            'notes',
+            Field('tags', placeholder='e.g. fasting, sick, "after meal"'),
+            Field('submit_button_type', type='hidden')
+        )
+
+    class Meta:
+        model = Color
+        exclude = ('user',)
+        widgets = {
+            'notes': forms.Textarea(attrs={'rows': 4}),
+        }
 
 class GlucoseInputForm(forms.ModelForm):
     # This is a hidden field that holds the submit type value. Used to
@@ -272,6 +327,19 @@ class GlucoseCreateForm(GlucoseInputForm):
         self.helper.add_input(Submit('submit_and_add', 'Save & Add Another',
                                      css_class='pull-right'))
 
+class ColorCreateForm(ColorInputForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ColorCreateForm, self).__init__(*args, **kwargs)
+
+        # Make record date and time not required. If these fields are empty
+        # the current date and time will be used.
+        self.fields['record_date'].required = False
+        self.fields['record_time'].required = False
+
+        self.helper.add_input(Submit('submit_and_add', 'Save & Add Another',
+                                     css_class='pull-right'))
+
 
 class GlucoseUpdateForm(GlucoseInputForm):
 
@@ -284,6 +352,22 @@ class GlucoseUpdateForm(GlucoseInputForm):
         self.fields['record_time'].widget.format = TIME_FORMAT
 
         delete_url = reverse('glucose_delete', args=(self.instance.id,))
+        self.helper.add_input(Button('delete', 'Delete',
+                                     onclick='location.href="%s";' % delete_url,
+                                     css_class='btn-danger pull-right'))
+
+
+class ColorUpdateForm(GlucoseInputForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ColorUpdateForm, self).__init__(*args, **kwargs)
+
+        # Set date and time formats to those supported by the
+        # bootstrap-datetimepicker widget.
+        self.fields['record_date'].widget.format = DATE_FORMAT
+        self.fields['record_time'].widget.format = TIME_FORMAT
+
+        delete_url = reverse('color_delete', args=(self.instance.id,))
         self.helper.add_input(Button('delete', 'Delete',
                                      onclick='location.href="%s";' % delete_url,
                                      css_class='btn-danger pull-right'))

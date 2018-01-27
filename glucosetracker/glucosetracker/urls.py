@@ -10,6 +10,7 @@ from blogs.feeds import LatestBlogsFeed
 from core.views import HomePageView
 from core.sitemaps import StaticViewSitemap
 from glucoses.views import dashboard
+from glucoses.views import dashboard_2
 
 
 admin.autodiscover()
@@ -54,6 +55,7 @@ urlpatterns = patterns('',
     url(r'^blog/', include('blogs.urls')),
 
     url(r'^dashboard/$', view=dashboard, name='dashboard'),
+    url(r'^dashboard-2/$', view=dashboard_2, name='dashboard-2'),
     url(r'^subscribe/$', view='subscribers.views.subscribe_view', name='subscribe'),
 )
 
