@@ -33,7 +33,7 @@ class Command(BaseCommand):
         Glucose.objects.filter(user=user).delete()
 
         end_date = date.today()
-        start_date = end_date - timedelta(days=90)
+        start_date = end_date - timedelta(days=30)
         for i in self.get_date_list(start_date, end_date):
             for _ in range(4):
                 GlucoseFactory(

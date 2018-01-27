@@ -18,11 +18,8 @@ class GlucoseFactory(DjangoModelFactory):
     FACTORY_FOR = Glucose
 
     user = SubFactory(UserFactory)
-    value = FuzzyInteger(50, 240)
+    value = FuzzyInteger(0, 50)
     category = SubFactory(CategoryFactory)
     record_date = date.today()
     record_time = FuzzyNaiveDateTime(datetime.now() - timedelta(hours=24))
-    notes = 'Hello! Please feel free to mess around.'
-
-
-
+    notes = 'This is a randomly generated dummy data'

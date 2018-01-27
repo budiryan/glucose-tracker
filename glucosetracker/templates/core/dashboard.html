@@ -14,7 +14,7 @@
         {{ sticky_message.message|safe }}
     </div>
 {% endif %}
-    
+
     <div class="row">
         <div class="col-md-6">
             <div class="panel">
@@ -24,7 +24,7 @@
                         <span class="fa fa-plus"></span> New Glucose</button>
                     </a>
                 </div>
-                <div class="btn-group">
+                <!-- <div class="btn-group">
                     <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="fa fa-stats"></span> Reports
                     <span class="caret"></span>
@@ -35,7 +35,7 @@
                     <li class="divider"></li>
                     <li><a href="{% url 'glucose_email_report' %}">E-mail Report</a></li>
                     </ul>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -47,7 +47,7 @@
     <div class="row">
         <div class="col-sm-6 col-md-6">
             <div class="row">
-                <div class="col-sm-6 col-md-6">
+                <div class="col-sm-12 col-md-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h5 class="panel-title text-center">
@@ -56,21 +56,6 @@
                         </div>
                         <div class="panel-body">
                             <h3 id="id_latest_entry"></h3>
-                            <p id="id_twitter_button" class="text-center"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-6 col-md-6">
-                    <div class="panel panel-default">
-                        <div id="id_hba1c_panel" class="panel-heading" data-toggle="tooltip"
-                             title="Based on the average blood glucose from the last 90 days.">
-                            <h3 class="panel-title text-center">
-                                <b>A1C Estimate*</b>
-                            </h3>
-                        </div>
-                        <div class="panel-body" style="padding-bottom:24px">
-                            <h3 id="id_hba1c"></h3>
                         </div>
                     </div>
                 </div>
@@ -176,10 +161,10 @@ $(document).ready(function() {
                 document.getElementById('id_latest_entry').className =
                     "text-center " + data['stats']['latest_entry']['css_class'];
 
-                document.getElementById('id_hba1c').innerHTML =
-                    data['stats']['hba1c']['value'];
-                document.getElementById('id_hba1c').className =
-                    "text-center " + data['stats']['hba1c']['css_class'];
+                // document.getElementById('id_hba1c').innerHTML =
+                //     data['stats']['hba1c']['value'];
+                // document.getElementById('id_hba1c').className =
+                //     "text-center " + data['stats']['hba1c']['css_class'];
 
                 /*document.getElementById('id_num_records').innerHTML =
                     data['stats']['num_records'];*/
@@ -207,14 +192,6 @@ $(document).ready(function() {
                     data['stats']['breakdown']['within_target'];
                 document.getElementById('id_other').innerHTML =
                     data['stats']['breakdown']['other'];
-
-                var twitter_text = "#bgnow "
-                    + data['stats']['latest_entry']['value']
-                    + " (" + data['stats']['latest_entry']['record_time']
-                    + ") " + data['stats']['latest_entry']['notes'];
-                // Remove leading and trailing spaces
-                twitter_text = twitter_text.trim();
-                updateTwitterValues(twitter_text, 'glucosetracker');
             }
         )};
 

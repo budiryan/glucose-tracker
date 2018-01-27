@@ -1,5 +1,5 @@
 {% load staticfiles %}
-    
+
 {% load compress %}
 
 <!DOCTYPE html>
@@ -11,9 +11,8 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>{% block title %}Simple Glucose Management App | {{ site_name }}{% endblock %}</title>
-        <meta name="description" content="GlucoseTracker is a simple and easy to use web application for keeping track of
-        your blood glucose levels. It's completely free with no ads. Modern look and mobile friendly!">
+        <title>{% block title %}FYP Urinalysis{% endblock %}</title>
+        <meta name="description" content="FYP Urinalysis">
 
         <!-- CSS -->
         {% compress css %}
@@ -57,10 +56,10 @@
                 </button>
                 {% if user.is_authenticated %}
                 <a class="navbar-brand" href="{% url 'dashboard' %}">
-                  <span class="fa fa-tint"></span> GlucoseTracker</a>
+                  <span class="fa fa-tint"></span> FYP Urinalysis</a>
                 {% else %}
                 <a class="navbar-brand" href="/">
-                  <span class="fa fa-tint"></span> GlucoseTracker</a>
+                  <span class="fa fa-tint"></span> FYP Urinalysis</a>
                 {% endif %}
             </div>
 
@@ -76,7 +75,7 @@
                         <span class="fa fa-th"></span>&nbsp;Dashboard</a>
                     </li>
 
-                    <li class="dropdown">
+                    <!-- <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                          <span class="fa fa-bar-chart"></span>&nbsp;Reports <b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -85,7 +84,7 @@
                       <li class="divider"></li>
                       <li><a href="{% url 'glucose_email_report' %}">Email Report</a></li>
                     </ul>
-                    </li>
+                    </li> -->
 
                     <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -104,12 +103,12 @@
                     </li>
                   {% else %}
                     <form class="navbar-form navbar-right">
-                    <button type="button" class="btn btn-primary"
+                    <!-- <button type="button" class="btn btn-primary"
                         onclick="location.href=&quot;{% url 'login' %}&quot;;">
-                        Log In</button>
-                    <button type="button" class="btn btn-success"
+                        Log In</button> -->
+                    <!-- <button type="button" class="btn btn-success"
                         onclick="location.href=&quot;{% url 'signup' %}&quot;;">
-                        Sign Up (Free!)</button>
+                        Sign Up (Free!)</button> -->
                     </form>
                   {% endif %}
               </ul>
@@ -137,10 +136,7 @@
                 <footer>
                   <p class="pull-right"><a href="#">Back to top</a></p>
                   <p class="text-muted">
-                      &copy; 2014 GlucoseTracker.net by <a href="http://www.calazan.com">Jonathan Calazan</a>
-                      | <a href="{% url 'blog_list_view' %}">Blog</a>
-                      | <a href="https://www.facebook.com/glucose.tracker/info">About</a>
-                      | <a href="mailto:info@glucosetracker.net">Contact Us</a>
+                  Budi Ryan | Jeffry Wicaksana | Christian Edwin Pranata
                   </p>
                 </footer>
             </div>
