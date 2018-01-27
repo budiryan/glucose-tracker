@@ -1,0 +1,255 @@
+# This is an auto-generated Django model module.
+# You'll have to do the following manually to clean this up:
+#   * Rearrange models' order
+#   * Make sure each model has one field with primary_key=True
+#   * Remove `managed = False` lines if you wish to allow Django to create and delete the table
+# Feel free to rename the models, but don't rename db_table values or field names.
+#
+# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
+# into your database.
+from __future__ import unicode_literals
+
+from django.db import models
+
+class AccountsUsersettings(models.Model):
+    glucose_low = models.PositiveIntegerField()
+    glucose_target_max = models.PositiveIntegerField()
+    glucose_high = models.PositiveIntegerField()
+    user_id = models.IntegerField(unique=True)
+    created = models.DateTimeField()
+    glucose_unit_id = models.IntegerField()
+    time_zone = models.CharField(max_length=63)
+    modified = models.DateTimeField()
+    default_category_id = models.IntegerField(blank=True, null=True)
+    glucose_target_min = models.PositiveIntegerField()
+    id = models.IntegerField(primary_key=True, blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'accounts_usersettings'
+
+class AuthGroup(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(unique=True, max_length=80)
+    class Meta:
+        managed = False
+        db_table = 'auth_group'
+
+class AuthGroupPermissions(models.Model):
+    id = models.IntegerField(primary_key=True)
+    group_id = models.IntegerField()
+    permission = models.ForeignKey('AuthPermission')
+    class Meta:
+        managed = False
+        db_table = 'auth_group_permissions'
+
+class AuthPermission(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=50)
+    content_type_id = models.IntegerField()
+    codename = models.CharField(max_length=100)
+    class Meta:
+        managed = False
+        db_table = 'auth_permission'
+
+class AuthUser(models.Model):
+    id = models.IntegerField(primary_key=True)
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField()
+    is_superuser = models.BooleanField()
+    username = models.CharField(unique=True, max_length=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.CharField(max_length=75)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    date_joined = models.DateTimeField()
+    class Meta:
+        managed = False
+        db_table = 'auth_user'
+
+class AuthUserGroups(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_id = models.IntegerField()
+    group = models.ForeignKey(AuthGroup)
+    class Meta:
+        managed = False
+        db_table = 'auth_user_groups'
+
+class AuthUserUserPermissions(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_id = models.IntegerField()
+    permission = models.ForeignKey(AuthPermission)
+    class Meta:
+        managed = False
+        db_table = 'auth_user_user_permissions'
+
+class AxesAccessattempt(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_agent = models.CharField(max_length=255)
+    ip_address = models.CharField(max_length=15, blank=True)
+    username = models.CharField(max_length=255, blank=True)
+    trusted = models.BooleanField()
+    http_accept = models.CharField(max_length=1025)
+    path_info = models.CharField(max_length=255)
+    attempt_time = models.DateTimeField()
+    get_data = models.TextField()
+    post_data = models.TextField()
+    failures_since_start = models.PositiveIntegerField()
+    class Meta:
+        managed = False
+        db_table = 'axes_accessattempt'
+
+class AxesAccesslog(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user_agent = models.CharField(max_length=255)
+    ip_address = models.CharField(max_length=15, blank=True)
+    username = models.CharField(max_length=255, blank=True)
+    trusted = models.BooleanField()
+    http_accept = models.CharField(max_length=1025)
+    path_info = models.CharField(max_length=255)
+    attempt_time = models.DateTimeField()
+    logout_time = models.DateTimeField(blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'axes_accesslog'
+
+class BlogsBlog(models.Model):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    author_id = models.IntegerField()
+    status = models.CharField(max_length=10)
+    title = models.CharField(max_length=250)
+    slug = models.CharField(unique=True, max_length=255)
+    content = models.TextField()
+    date_published = models.DateTimeField(blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'blogs_blog'
+
+class BlogsBlogad(models.Model):
+    id = models.IntegerField(primary_key=True)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    description = models.CharField(max_length=255, blank=True)
+    code = models.TextField()
+    position = models.CharField(max_length=10, blank=True)
+    class Meta:
+        managed = False
+        db_table = 'blogs_blogad'
+
+class DjangoAdminLog(models.Model):
+    id = models.IntegerField(primary_key=True)
+    action_time = models.DateTimeField()
+    user = models.ForeignKey(AuthUser)
+    content_type = models.ForeignKey('DjangoContentType', blank=True, null=True)
+    object_id = models.TextField(blank=True)
+    object_repr = models.CharField(max_length=200)
+    action_flag = models.PositiveSmallIntegerField()
+    change_message = models.TextField()
+    class Meta:
+        managed = False
+        db_table = 'django_admin_log'
+
+class DjangoContentType(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=100)
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+    class Meta:
+        managed = False
+        db_table = 'django_content_type'
+
+class DjangoSession(models.Model):
+    session_key = models.CharField(unique=True, max_length=40)
+    session_data = models.TextField()
+    expire_date = models.DateTimeField()
+    class Meta:
+        managed = False
+        db_table = 'django_session'
+
+class DjangoSite(models.Model):
+    id = models.IntegerField(primary_key=True)
+    domain = models.CharField(max_length=100)
+    name = models.CharField(max_length=50)
+    class Meta:
+        managed = False
+        db_table = 'django_site'
+
+class GlucosesCategory(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(unique=True, max_length=255)
+    class Meta:
+        managed = False
+        db_table = 'glucoses_category'
+
+class GlucosesGlucose(models.Model):
+    user_id = models.IntegerField()
+    record_time = models.TimeField()
+    created = models.DateTimeField()
+    notes = models.TextField()
+    modified = models.DateTimeField()
+    value = models.PositiveIntegerField()
+    record_date = models.DateField()
+    category_id = models.IntegerField()
+    id = models.IntegerField(primary_key=True, blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'glucoses_glucose'
+
+class GlucosesUnit(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(unique=True, max_length=6)
+    class Meta:
+        managed = False
+        db_table = 'glucoses_unit'
+
+class SouthMigrationhistory(models.Model):
+    id = models.IntegerField(primary_key=True)
+    app_name = models.CharField(max_length=255)
+    migration = models.CharField(max_length=255)
+    applied = models.DateTimeField()
+    class Meta:
+        managed = False
+        db_table = 'south_migrationhistory'
+
+class StickymessagesMessage(models.Model):
+    id = models.IntegerField(primary_key=True)
+    message = models.TextField()
+    active_datetime = models.DateTimeField()
+    inactive_datetime = models.DateTimeField()
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    created_by = models.ForeignKey(AuthUser, blank=True, null=True)
+    modified_by = models.ForeignKey(AuthUser, blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'stickymessages_message'
+
+class SubscribersSubscriber(models.Model):
+    email = models.CharField(unique=True, max_length=75)
+    source_ip = models.CharField(max_length=15, blank=True)
+    id = models.IntegerField(primary_key=True, blank=True, null=True)
+    modified = models.DateTimeField()
+    created = models.DateTimeField()
+    class Meta:
+        managed = False
+        db_table = 'subscribers_subscriber'
+
+class TaggitTag(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(unique=True, max_length=100)
+    slug = models.CharField(unique=True, max_length=100)
+    class Meta:
+        managed = False
+        db_table = 'taggit_tag'
+
+class TaggitTaggeditem(models.Model):
+    id = models.IntegerField(primary_key=True)
+    tag_id = models.IntegerField()
+    object_id = models.IntegerField()
+    content_type_id = models.IntegerField()
+    class Meta:
+        managed = False
+        db_table = 'taggit_taggeditem'
+
